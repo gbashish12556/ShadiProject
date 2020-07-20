@@ -6,12 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.shadiproject.Pojo.PersonInfo
+import io.reactivex.subjects.PublishSubject
 import java.lang.Exception
 
 class InvitationAdapter(private val mContext: Context, private var mItems: List<PersonInfo>?) : RecyclerView.Adapter<InvitationAdapter.ViewHolder>() {
+
+    private var personClickPublishsubject: PublishSubject<PersonInfo> = PublishSubject.create()
 
     override fun getItemCount(): Int {
         return mItems!!.size
@@ -22,12 +26,16 @@ class InvitationAdapter(private val mContext: Context, private var mItems: List<
         val personImage: ImageView
         val personName: TextView
         val personAge: TextView
+        val statusView: TextView
+        val parentLayout: ConstraintLayout
 
         init {
 
             personImage = itemView.findViewById(R.id.personImage) as ImageView
             personName = itemView.findViewById(R.id.personName) as TextView
             personAge = itemView.findViewById(R.id.personAge) as TextView
+            statusView = itemView.findViewById(R.id.status) as TextView
+            parentLayout = itemView.findViewById(R.id.parentLayout) as ConstraintLayout
 
         }
 
@@ -55,6 +63,11 @@ class InvitationAdapter(private val mContext: Context, private var mItems: List<
         }
         holder.personAge.text = String.format(mContext.getString(R.string.age), item.age)
         holder.personName.text = item.name
+        holder.statusView.text = item.status ?: "No Action"
+
+        holder.parentLayout.setOnClickListener{
+            personClickPublishsubject.onNext(item)
+        }
 
     }
     private fun getItem(adapterPosition: Int): PersonInfo {
@@ -64,6 +77,11 @@ class InvitationAdapter(private val mContext: Context, private var mItems: List<
     fun resetList(issues: List<PersonInfo>) {
         mItems = issues
         notifyDataSetChanged()
+    }
+
+
+    fun getPersonPublishSubject():PublishSubject<PersonInfo>{
+        return personClickPublishsubject
     }
 
 

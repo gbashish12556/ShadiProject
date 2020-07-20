@@ -16,4 +16,7 @@ interface InvitationDao {
     @Query("SELECT*FROM invitation_table")
     fun getAllInvitation(): LiveData<List<PersonInfo>>
 
+    @Query("UPDATE invitation_table SET status = :status WHERE id = :id")
+    abstract fun updateStatus(status: String,id:String): Int
+
 }

@@ -19,6 +19,10 @@ class InvitationviewModel(application: Application) : AndroidViewModel(applicati
         return invitationRepository!!.getAllInvitation()
     }
 
+    fun updateStatus(status:String,id:String){
+        invitationRepository!!.updateStatus(status,id)
+    }
+
 
     init {
         invitationRepository = InvitationRepository(application)

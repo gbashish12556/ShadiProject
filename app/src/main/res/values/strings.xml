@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">ShadiProject</string>
     <string name="age">Age: %1$s</string>
+    <string name="status_message">You have %1$s this person</string>
+    <string name="name_string">Name: %1$s </string>
+    <string name="age_string">Age: %1$s </string>
+    <string name="phone_string">Phone: %1$s </string>
+    <string name="email_string">Email: %1$s </string>
+    <string name="country_string">Country: %1$s </string>
 </resources>

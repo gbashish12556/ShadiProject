@@ -13,7 +13,7 @@ import com.example.shadiproject.Pojo.PersonInfo;
 import com.example.shadiproject.Pojo.PictureConverter;
 
 
-@Database(entities = PersonInfo.class,version = 2, exportSchema = false)
+@Database(entities = PersonInfo.class, version = 3, exportSchema = false)
 @TypeConverters(PictureConverter.class)
 public abstract class InvitationDatabase extends RoomDatabase {
 

@@ -18,7 +18,7 @@ data class PersonInfo(
     var age: Int?,
     var phone: String?,
     var cell: String?,
-
+    var country: String?,
     @TypeConverters(PictureConverter::class)
     var picture: Picture?,
 
@@ -26,6 +26,6 @@ data class PersonInfo(
 
     var is_action_taken:Boolean?,
 
-    var status:String?
+    var status:String? = null
 
 ) : Serializable

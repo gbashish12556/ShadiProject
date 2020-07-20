@@ -26,6 +26,10 @@ class ResultItem : Serializable {
     @Expose
     var email: String? = null
 
+    @SerializedName("location")
+    @Expose
+    var locations: Location? = null
+
     @SerializedName("dob")
     @Expose
     var dob: Dob? = null

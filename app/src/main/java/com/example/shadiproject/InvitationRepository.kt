@@ -29,6 +29,12 @@ class InvitationRepository {
         return invitation
     }
 
+    fun updateStatus(status:String,id:String){
+        Thread(Runnable {
+            invitationDao!!.updateStatus(status,id)
+        }).start()
+    }
+
     fun getCurrentStatus(): MutableLiveData<Boolean> {
         return status!!
     }
@@ -73,10 +79,14 @@ class InvitationRepository {
         for (i in response.indices) {
             val item = response[i]
 
+            var country = "NA"
+            if(item.locations !=  null && item.locations!!.country != null){
+                country = item.locations!!.country!!
+            }
             issues.add(
                 PersonInfo(
                     item!!.login!!.uuid,item.gender, item.name!!.title+" "+item.name!!.first+" "+item.name!!.last,item.email!!,item.dob!!.date,
-                    item.dob!!.age,item.phone!!, item.cell!!, item.picture, Date().time, false, null
+                    item.dob!!.age,item.phone!!, item.cell!!, country, item.picture, Date().time, false, null
                 )
             )
         }
