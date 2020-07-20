@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ShadiProject</string>
+    <string name="age">Age: %1$s</string>
+</resources>
