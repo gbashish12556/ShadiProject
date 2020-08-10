@@ -14,6 +14,10 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import com.bumptech.glide.Glide
 import com.example.shadiproject.Pojo.PersonInfo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.lang.Exception
 
 class ResultActivity : AppCompatActivity() {
@@ -32,22 +36,32 @@ class ResultActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_result)
-        invitationViewModel = ViewModelProviders.of(this).get(InvitationviewModel::class.java)
+        invitationViewModel = ViewModelProviders.of(this, ViewModelFactory(InvitationRepository(application)
+        )).get(InvitationviewModel::class.java)
         ButterKnife.bind(this)
-        updateview()
+
+        var personInfo = intent.extras?.getSerializable("personInfo") as PersonInfo
+
+        acceptButton.setOnClickListener({
+            GlobalScope.launch(Dispatchers.Main) {
+                insertAndUpdate("Accepted", personInfo.id!!)
+            }
+        })
+
+        rejectButton.setOnClickListener({
+            GlobalScope.launch(Dispatchers.Main) {
+                insertAndUpdate("Rejected",personInfo.id!!)
+            }
+        })
+
+
+        updateview(personInfo)
+
     }
 
-    fun updateview(){
+
+    fun updateview(personInfo:PersonInfo){
         if(intent != null && intent.extras != null) {
-            var personInfo = intent.extras?.getSerializable("personInfo") as PersonInfo
-
-            acceptButton.setOnClickListener({
-                updateStatus("Accepted",personInfo.id!!)
-            })
-            rejectButton.setOnClickListener({
-                updateStatus("Rejected",personInfo.id!!)
-            })
-
             try {
                 Glide.with(this)
                     .load(personInfo.picture!!.large)
@@ -69,18 +83,34 @@ class ResultActivity : AppCompatActivity() {
                 statusButtonView.visibility = View.VISIBLE
                 statusMessage.visibility = View.GONE
             }
-            personName.text = String.format(getString(R.string.name_string), personInfo.name)
-            personAge.text = String.format(getString(R.string.age_string), personInfo.age)
-            personPhone.text = String.format(getString(R.string.phone_string), personInfo.phone)
-            personEmail.text = String.format(getString(R.string.email_string), personInfo.email)
-            personCountry.text = String.format(getString(R.string.country_string), personInfo.country)
+            personInfo.let {
+                personName.text = String.format(getString(R.string.name_string), it.name)
+                personAge.text = String.format(getString(R.string.age_string), it.age)
+                personPhone.text = String.format(getString(R.string.phone_string), it.phone)
+                personEmail.text = String.format(getString(R.string.email_string), it.email)
+                personCountry.text = String.format(getString(R.string.country_string), it.country)
+            }
         }
     }
 
-    fun updateStatus(status:String, id:String){
-        invitationViewModel!!.updateStatus(status,id)
-        statusButtonView.visibility = View.GONE
-        statusMessage.visibility = View.VISIBLE
-        statusMessage.text = String.format(getString(R.string.status_message), status)
+     suspend fun insertAndUpdate(status:String, id:String){
+         var data  = GlobalScope.async(Dispatchers.IO) {
+             updateDatabase(status,id)
+         }.await()
+
+         if(data) {
+             statusButtonView.visibility = View.GONE
+             statusMessage.visibility = View.VISIBLE
+             statusMessage.text = String.format(getString(R.string.status_message), status)
+         }
+    }
+
+    fun updateDatabase(status:String, id:String):Boolean{
+        try {
+            invitationViewModel!!.updateStatus(status, id)
+            return true
+        }catch (e:Exception){
+            return false
+        }
     }
 }

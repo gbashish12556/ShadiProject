@@ -11,12 +11,12 @@ import com.example.shadiproject.Pojo.PersonInfo
 interface InvitationDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(invitations: List<PersonInfo>)
+    fun insert(invitations: List<PersonInfo>)
 
     @Query("SELECT*FROM invitation_table")
-    fun getAllInvitation(): LiveData<List<PersonInfo>>
+    fun getAllInvitation(): List<PersonInfo>
 
     @Query("UPDATE invitation_table SET status = :status WHERE id = :id")
-    abstract fun updateStatus(status: String,id:String): Int
+    fun updateStatus(status: String,id:String): Int
 
 }

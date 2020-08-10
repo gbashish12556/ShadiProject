@@ -13,7 +13,8 @@ import com.example.shadiproject.Pojo.PersonInfo
 import io.reactivex.subjects.PublishSubject
 import java.lang.Exception
 
-class InvitationAdapter(private val mContext: Context, private var mItems: List<PersonInfo>?) : RecyclerView.Adapter<InvitationAdapter.ViewHolder>() {
+class InvitationAdapter(private val mContext: Context, private var mItems: ArrayList<PersonInfo>?)
+    : RecyclerView.Adapter<InvitationAdapter.ViewHolder>() {
 
     private var personClickPublishsubject: PublishSubject<PersonInfo> = PublishSubject.create()
 
@@ -54,10 +55,12 @@ class InvitationAdapter(private val mContext: Context, private var mItems: List<
         val item = mItems!![position]
 
         try {
+
             Glide.with(mContext)
                 .load(item.picture!!.thumbnail)
                 .thumbnail(0.1f)
                 .into(holder.personImage);
+
         }catch (e:Exception){
             //
         }
@@ -70,19 +73,14 @@ class InvitationAdapter(private val mContext: Context, private var mItems: List<
         }
 
     }
-    private fun getItem(adapterPosition: Int): PersonInfo {
-        return mItems!![adapterPosition]
-    }
-
-    fun resetList(issues: List<PersonInfo>) {
-        mItems = issues
-        notifyDataSetChanged()
-    }
 
 
     fun getPersonPublishSubject():PublishSubject<PersonInfo>{
         return personClickPublishsubject
     }
 
+    fun addData(list: List<PersonInfo>) {
+        mItems = list as ArrayList<PersonInfo>
+    }
 
 }

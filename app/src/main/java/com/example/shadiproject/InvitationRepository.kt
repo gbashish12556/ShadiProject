@@ -1,11 +1,14 @@
 package com.example.shadiproject
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.shadiproject.Pojo.PersonInfo
 import com.example.shadiproject.Pojo.ResultItem
 import com.example.shadiproject.Pojo.ShadiResponse
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -13,6 +16,7 @@ import java.util.*
 
 class InvitationRepository {
 
+    private var allData = MutableLiveData<Resource<List<PersonInfo>>>()
     private var invitationDao: InvitationDao? = null
     private var status: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
 
@@ -21,22 +25,19 @@ class InvitationRepository {
         invitationDao = noteDatabase.invitationDao()
     }
 
-    fun getAllInvitation(): LiveData<List<PersonInfo>> {
+    fun getAllInvitation(): MutableLiveData<Resource<List<PersonInfo>>> {
         val invitation = invitationDao!!.getAllInvitation()
-        if (invitation.getValue() == null) {
+        if (invitation.size < 1) {
+            allData.postValue(Resource.loading(arrayListOf()))
             fetchData()
+        }else{
+            allData.postValue(Resource.success(invitation))
         }
-        return invitation
+        return allData
     }
 
     fun updateStatus(status:String,id:String){
-        Thread(Runnable {
             invitationDao!!.updateStatus(status,id)
-        }).start()
-    }
-
-    fun getCurrentStatus(): MutableLiveData<Boolean> {
-        return status!!
     }
 
 
@@ -53,18 +54,18 @@ class InvitationRepository {
 
                 if (response.code() == 200) {
                     val reponse = response.body()
-                    if (reponse.results!!.size > 0) {
+                    if (reponse!!.results!!.size > 0) {
                         callInsert(reponse.results!!)
                     } else {
-                        status!!.setValue(false)
+                        allData.postValue(Resource.error("Failed",null))
                     }
                 } else {
-                    status!!.setValue(false)
+                    allData.postValue(Resource.error("Failed",null))
                 }
             }
 
             override fun onFailure(call: Call<ShadiResponse>, t: Throwable) {
-                status!!.setValue(false)
+                allData.postValue(Resource.error("Failed",null))
             }
 
         })
@@ -72,7 +73,8 @@ class InvitationRepository {
     }
 
     fun callInsert(result:List<ResultItem>){
-            insert(convertToInvitation(result))
+        var data = convertToInvitation((result))
+        insert(data)
     }
     fun convertToInvitation(response: List<ResultItem>): List<PersonInfo> {
         val issues = ArrayList<PersonInfo>()
@@ -94,8 +96,9 @@ class InvitationRepository {
     }
 
     fun insert(list:List<PersonInfo>){
-        Thread(Runnable {
+        GlobalScope.launch {
             invitationDao!!.insert(list)
-        }).start()
+        }
+        allData.postValue(Resource.success(list))
     }
 }

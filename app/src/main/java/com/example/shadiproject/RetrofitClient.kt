@@ -21,7 +21,7 @@ class RetrofitClient private constructor() {
         logging.level = HttpLoggingInterceptor.Level.BODY
 
 
-        var client = OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).readTimeout(5, TimeUnit.SECONDS)
+        var client = OkHttpClient.Builder().connectTimeout(1, TimeUnit.SECONDS).readTimeout(1, TimeUnit.SECONDS)
             .addInterceptor(logging)
             .build()
 
